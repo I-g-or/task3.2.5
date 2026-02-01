@@ -1,0 +1,85 @@
+name: Build & release Docker image
+on:
+  push:
+    branchs:   
+      - 'main' 
+      - 'release/v0.*.*' 
+    tags:
+      - '0.*.*'
+  pull_request:
+    branchs:
+      - 'main'
+
+name: Docker image CD
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+  pull_request:
+    branches:
+      - 'main'
+
+env: 
+  COMMIT_SHA: ${{ github.sha }}
+  BRANCH_NAME: ${{ github.ref_name }}
+  AWS_REGION: 'il-central-1'
+  AWS_ROLE_ARN: 'arn:aws:iam::103002841798:role/GitHub-Actions-ECR-Role'
+
+jobs: 
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # for draft release
+
+    env: 
+      IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPO }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.1
+        with:
+          role-to-assume: ${{ var.AWS_ROLE_ARN }}
+          aws-region: ${{ var.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker bild 
+        run: |
+          cd 
+          docker build -t ${IMAGE_URI}:${COMMIT_SHA} .
+
+      - name: Docker tag
+        run: |
+          RELEASE_VERSION=${BRANCH_NAME#release/}
+          docker tag ${IMAGE_URI}:${COMMIT_SHA} ${IMAGE_URI}:${RELEASE_VERSION}
+
+      - name: Docker tag and push "latest" version
+        if:  github.ref_name == 'main'
+        run: |
+          docker tag ${IMAGE_URI}:${COMMIT_SHA} ${IMAGE_URI}:latest
+          docker push ${IMAGE_URI}:latest
+
+      - name: Docker push image to Amazon ECR
+        run: |
+            RELEASE_VERSION=${BRANCH_NAME#release/}
+            docker push ${IMAGE_URI}:${COMMIT_SHA}
+            docker push ${IMAGE_URI}:${RELEASE_VERSION}
+
+      - name: Create draft GitHub release
+        if: startsWith(github.ref_name, 'release/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: true
+
+
