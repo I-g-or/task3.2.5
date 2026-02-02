@@ -3,7 +3,7 @@ on:
   push:
     branches:   
       - 'main' 
-      - 'release/v0.[0-9].[0-9]' 
+      - 'realease/v0.*.*' 
   pull_request:
     branches:
       - 'main'
@@ -45,7 +45,7 @@ jobs:
 
       - name: Docker tag
         run: |
-          RELEASE_VERSION=${BRANCH_NAME#release/}
+          RELEASE_VERSION=${BRANCH_NAME#realease/}
           docker tag ${IMAGE_URI}:${COMMIT_SHA} ${IMAGE_URI}:${RELEASE_VERSION}
 
       - name: Docker tag and push "latest" version
@@ -56,12 +56,12 @@ jobs:
 
       - name: Docker push image to Amazon ECR
         run: |
-          RELEASE_VERSION=${BRANCH_NAME#release/}
+          RELEASE_VERSION=${BRANCH_NAME#realease/}
           docker push ${IMAGE_URI}:${COMMIT_SHA}
           docker push ${IMAGE_URI}:${RELEASE_VERSION}
 
       - name: Create draft GitHub release
-        if: startsWith(github.ref_name, 'release/v0')
+        if: startsWith(github.ref_name, 'realease/v0')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
