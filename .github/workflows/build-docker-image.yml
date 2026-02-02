@@ -31,16 +31,17 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5.1.1
         with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Set Image URI
+        run: echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPO }}" >> $GITHUB_ENV
+
       - name: Docker bild 
-        env:
-          IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPO }}
         run: |
           docker build -t ${IMAGE_URI}:${COMMIT_SHA} .
 
