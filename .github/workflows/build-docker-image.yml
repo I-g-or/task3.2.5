@@ -1,4 +1,4 @@
-name: Build & release Docker image
+name: Build Docker image & release to Amazon ECR
 on:
   push:
     branches:   
@@ -57,13 +57,13 @@ jobs:
 
       - name: Docker bild and tag
         run: |
-          RELEASE_VERSION=${{ github.ref_name }}"    
+          RELEASE_VERSION=${{ github.ref_name }}    
           docker build -t ${IMAGE_URI}:${COMMIT_SHA} .
           docker tag ${IMAGE_URI}:${COMMIT_SHA} ${IMAGE_URI}:${RELEASE_VERSION}
 
       - name: Docker push image to Amazon ECR
         run: |
-          RELEASE_VERSION=${{ github.ref_name }}"
+          RELEASE_VERSION=${{ github.ref_name }}
           echo "IMAGE URI: ${IMAGE_URI}"
           docker push ${IMAGE_URI}:${COMMIT_SHA}
           docker push ${IMAGE_URI}:${RELEASE_VERSION}
