@@ -1,17 +1,23 @@
 #!/bin/bash
 
-REPO_NAME="study/task3.2.5"
-REGION="il-central-1"
+AWS_ACCOUNT_ID="103002841798"
+AWS_REPO_NAME="study/task3.2.5"
+AWS_REGION="il-central-1"
 APP_NAME="ghostfolio"
 COMPOSE_FILE="docker-compose.yml"
 
+# Amazon ECR login
+aws ecr get-login-password --region "$AWS_REGION" \
+| docker login \
+  --username AWS \
+  --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
 # Get the latest tag from ECR (excluding latest)
 echo "Checking ECR image version..."
 log "Checking ECR image version..."
 ECR_VERSION=$(aws ecr describe-images \
-    --repository-name "$REPO_NAME" \
-    --region "$REGION" \
+    --repository-name "$AWS_REPO_NAME" \
+    --region "$AWS_REGION" \
     --query 'imageDetails[].imageTags[]' \
     --output text | tr '\t' '\n' | grep -E '^v?[0-9]+\.[0-9]+' | sort -V | tail -n 1)
 
@@ -34,7 +40,7 @@ if [ "$LATEST_VERSION" == "$ECR_VERSION" ] && [ "$LATEST_VERSION" != "$RUNNING_V
     echo "New version found! Starting the update to $ECR_VERSION..."
     # 1. Меняем тег в docker-compose.yml
     # Ищем строку с образом для конкретного сервиса и меняем всё после двоеточия
-    sed -i "/image:.*$REPO_NAME/s/:.*$/:$ECR_VERSION/" "$COMPOSE_FILE"
+    sed -i "/image:.*$AWS_REPO_NAME/s/:.*$/:$ECR_VERSION/" "$COMPOSE_FILE"
 
     echo "Download new image..."
     docker compose -f "$COMPOSE_FILE" pull "$APP_NAME"
