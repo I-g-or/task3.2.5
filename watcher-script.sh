@@ -1,8 +1,5 @@
 #!/bin/bash
 
-AWS_ACCOUNT_ID="103002841798"
-AWS_REPO_NAME="study/task3.2.5"
-AWS_REGION="il-central-1"
 APP_NAME="ghostfolio"
 COMPOSE_FILE="docker-compose.yml"
 
@@ -20,6 +17,7 @@ ECR_VERSION=$(aws ecr describe-images \
     --region "$AWS_REGION" \
     --query 'imageDetails[].imageTags[]' \
     --output text | tr '\t' '\n' | grep -E '^v?[0-9]+\.[0-9]+' | sort -V | tail -n 1)
+echo "ECR_VERSION=$ECR_VERSION" >> /etc/environment
 
 # Get the running image
 echo "Checking local version..."
