@@ -39,17 +39,6 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # - name: Docker meta
-      #   id: meta
-      #   uses: docker/metadata-action@v5
-      #   with:
-      #     images: ghostfolio/ghostfolio
-      #     tags: |
-      #       type=ref,event=branch
-      #       type=ref,event=pr
-      #       type=semver,pattern={{version}}
-      #       type=semver,pattern={{major}}.{{minor}}
-
       - name: Set Image URI
         run: |
           echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.AWS_ECR_REPO }}" >> $GITHUB_ENV
@@ -75,7 +64,7 @@ jobs:
           docker push ${IMAGE_URI}:latest
 
       - name: Create draft GitHub release
-        if: startsWith(github.ref_name, 'v4')
+        if: startsWith(github.ref_name, 'v0')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
