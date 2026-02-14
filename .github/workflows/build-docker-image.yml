@@ -21,7 +21,7 @@ jobs:
         COMMIT_SHA: ${{ github.sha }}
         AWS_REGION: 'il-central-1'
         AWS_ROLE_ARN: 'arn:aws:iam::103002841798:role/GitHub-Actions-ECR-Role'
-        AWS_ECR_REPO: 'study/task3.2.5'
+        AWS_ECR_REPO: 'study/ghostfolio'
 
     steps:
       - name: Checkout repository
