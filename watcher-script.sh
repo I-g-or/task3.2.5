@@ -36,9 +36,8 @@ LATEST_VERSION=$(printf "$ECR_VERSION\n$RUNNING_VERSION" | sort -V | tail -n 1)
 
 if [ "$LATEST_VERSION" == "$ECR_VERSION" ] && [ "$LATEST_VERSION" != "$RUNNING_VERSION" ]; then
     echo "New version found! Starting the update to $ECR_VERSION..."
-    # 1. Меняем тег в docker-compose.yml
-    # Ищем строку с образом для конкретного сервиса и меняем всё после двоеточия
-    sed -i "/image:.*$AWS_REPO_NAME/s/:.*$/:$ECR_VERSION/" "$COMPOSE_FILE"
+    APP_VERSION=$ECR_VERSION
+    echo "APP_VERSION=$APP_VERSION" >> /etc/environment
 
     echo "Download new image..."
     docker compose -f "$COMPOSE_FILE" pull "$APP_NAME"
