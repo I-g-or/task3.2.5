@@ -28,9 +28,6 @@ RUNNING_VERSION="${RUNNING_IMAGE##*:}"
 echo "ECR image: $ECR_VERSION"
 echo "Local runnning image: $RUNNING_VERSION"
 
-log "ECR image: $ECR_VERSION"
-log "Local runnning image: $RUNNING_VERSION"
-
 # Comparison of versions
 LATEST_VERSION=$(printf "$ECR_VERSION\n$RUNNING_VERSION" | sort -V | tail -n 1)
 
