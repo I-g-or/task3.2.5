@@ -20,6 +20,7 @@ ECR_VERSION=$(aws ecr describe-images \
     --query 'imageDetails[].imageTags[]' \
     --output text | tr '\t' '\n' | grep -E '^v?[0-9]+\.[0-9]+' | sort -V | tail -n 1)
 echo "ECR_VERSION=$ECR_VERSION" >> /etc/environment
+cd /home/ec2-user/task3-2-5/docker
 
 # Get the running image
 echo "Checking local version..."
