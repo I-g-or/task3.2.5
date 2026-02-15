@@ -1,5 +1,8 @@
 #!/bin/bash
 
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+AWS_REGION="il-central-1"
+AWS_REPO_NAME="study/ghostfolio"
 APP_NAME="ghostfolio"
 COMPOSE_FILE="docker-compose.yml"
 
@@ -11,7 +14,6 @@ aws ecr get-login-password --region "$AWS_REGION" \
 
 # Get the latest tag from ECR (excluding latest)
 echo "Checking ECR image version..."
-log "Checking ECR image version..."
 ECR_VERSION=$(aws ecr describe-images \
     --repository-name "$AWS_REPO_NAME" \
     --region "$AWS_REGION" \
@@ -21,7 +23,6 @@ echo "ECR_VERSION=$ECR_VERSION" >> /etc/environment
 
 # Get the running image
 echo "Checking local version..."
-log "Checking local version..."
 RUNNING_IMAGE=$(docker compose -f "$COMPOSE_FILE" images -q "$APP_NAME" | xargs docker inspect --format '{{.Config.Image}}' 2>/dev/null)
 RUNNING_VERSION="${RUNNING_IMAGE##*:}"
 
