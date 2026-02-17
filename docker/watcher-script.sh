@@ -6,6 +6,7 @@ AWS_REPO_NAME="study/ghostfolio"
 APP_NAME="ghostfolio"
 COMPOSE_FILE="docker-compose.yml"
 
+sudo source /etc/environment
 # Amazon ECR login
 aws ecr get-login-password --region "$AWS_REGION" \
 | docker login \
@@ -36,7 +37,8 @@ LATEST_VERSION=$(printf "$ECR_VERSION\n$RUNNING_VERSION" | sort -V | tail -n 1)
 if [ "$LATEST_VERSION" == "$ECR_VERSION" ] && [ "$LATEST_VERSION" != "$RUNNING_VERSION" ]; then
     echo "New version found! Starting the update to $ECR_VERSION..."
     APP_VERSION=$ECR_VERSION
-    echo "APP_VERSION=$APP_VERSION" >> /etc/environment
+    sudo sed -i "s/^APP_VERSION=.*/APP_VERSION=${APP_VERSION}/" /etc/environment
+    sudo source /etc/environment
 
     echo "Download new image..."
     docker compose -f "$COMPOSE_FILE" pull "$APP_NAME"
