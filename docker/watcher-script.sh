@@ -7,7 +7,8 @@
 AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID}"
 AWS_REGION="${AWS_REGION}"
 AWS_REPO_NAME="${AWS_REPO_NAME}"
-CURRENT_VERSION="${APP_VERSION}"
+RUNNING_IMAGE="0.0.6"
+
 
 # AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 # AWS_REGION="il-central-1"
@@ -28,14 +29,13 @@ ECR_VERSION=$(aws ecr describe-images \
     --region "$AWS_REGION" \
     --query 'imageDetails[].imageTags[]' \
     --output text | tr '\t' '\n' | grep -E '^v?[0-9]+\.[0-9]+' | sort -V | tail -n 1)
-#echo "ECR_VERSION=$ECR_VERSION" >> /etc/environment
 sudo sed -i "s/^ECR_VERSION=.*/ECR_VERSION=${ECR_VERSION}/" /etc/environment
 
 cd /home/ec2-user/task3-2-5/docker
 
 # Get the running image
 echo "Checking local version..."
-RUNNING_IMAGE=$(docker compose -f docker-compose.yml images -q ghostfolio | xargs docker inspect --format '{{.Config.Image}}' 2>/dev/null)
+RUNNING_IMAGE=$(sudo docker compose -f docker-compose.yml images -q ghostfolio | xargs sudo docker inspect --format '{{.Config.Image}}' 2>/dev/null)
 RUNNING_VERSION="${RUNNING_IMAGE##*:}"
 
 echo "ECR image: $ECR_VERSION"
@@ -55,9 +55,6 @@ if [ "$LATEST_VERSION" == "$ECR_VERSION" ] && [ "$LATEST_VERSION" != "$RUNNING_V
 
     echo "Rebooting Docker Compose..."
     sudo docker compose -f docker-compose.yml up -d ghostfolio
-
-    echo "Deleting old images..."
-    sudo docker image prune -f
 
     echo "The update was completed successfully!"
     exit 0
