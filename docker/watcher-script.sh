@@ -33,7 +33,7 @@ cd /home/ec2-user/task3-2-5/docker
 
 # Get the running image
 echo "Checking local version..."
-RUNNING_IMAGE=$(docker compose -f "$COMPOSE_FILE" images -q "$APP_NAME" | xargs docker inspect --format '{{.Config.Image}}' 2>/dev/null)
+RUNNING_IMAGE=$(docker compose -f docker-compose.yml images -q "$APP_NAME" | xargs docker inspect --format '{{.Config.Image}}' 2>/dev/null)
 RUNNING_VERSION="${RUNNING_IMAGE##*:}"
 
 echo "ECR image: $ECR_VERSION"
@@ -46,16 +46,16 @@ if [ "$LATEST_VERSION" == "$ECR_VERSION" ] && [ "$LATEST_VERSION" != "$RUNNING_V
     echo "New version found! Starting the update to $ECR_VERSION..."
     APP_VERSION=$ECR_VERSION
     sudo sed -i "s/^APP_VERSION=.*/APP_VERSION=${APP_VERSION}/" /etc/environment
-    sudo source /etc/environment
+    . /etc/environment
 
     echo "Download new image..."
-    docker compose -f "$COMPOSE_FILE" pull "$APP_NAME"
+    sudo docker compose -f docker-compose.yml pull "$APP_NAME"
 
     echo "Rebooting Docker Compose..."
-    docker compose -f "$COMPOSE_FILE" up -d "$APP_NAME"
+    sudo docker compose -f docker-compose.yml up -d "$APP_NAME"
 
     echo "Deleting old images..."
-    docker image prune -f
+    sudo docker image prune -f
 
     echo "The update was completed successfully!"
     exit 0
