@@ -1,12 +1,20 @@
 #!/bin/bash
 
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-AWS_REGION="il-central-1"
-AWS_REPO_NAME="study/ghostfolio"
-APP_NAME="ghostfolio"
-COMPOSE_FILE="docker-compose.yml"
+# Load global environment variables
+. /etc/environment
 
-sudo source /etc/environment
+# Required variables
+AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID}"
+AWS_REGION="${AWS_REGION}"
+REPOSITORY="${REPOSITORY}"
+CURRENT_VERSION="${APP_VERSION}"
+
+# AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+# AWS_REGION="il-central-1"
+# AWS_REPO_NAME="study/ghostfolio"
+# APP_NAME="ghostfolio"
+# COMPOSE_FILE="docker-compose.yml"
+
 # Amazon ECR login
 aws ecr get-login-password --region "$AWS_REGION" \
 | docker login \
@@ -31,7 +39,7 @@ RUNNING_VERSION="${RUNNING_IMAGE##*:}"
 echo "ECR image: $ECR_VERSION"
 echo "Local runnning image: $RUNNING_VERSION"
 
-# Comparison of versions
+# Compare versions
 LATEST_VERSION=$(printf "$ECR_VERSION\n$RUNNING_VERSION" | sort -V | tail -n 1)
 
 if [ "$LATEST_VERSION" == "$ECR_VERSION" ] && [ "$LATEST_VERSION" != "$RUNNING_VERSION" ]; then
