@@ -31,11 +31,11 @@ ECR_VERSION=$(aws ecr describe-images \
     --output text | tr '\t' '\n' | grep -E '^v?[0-9]+\.[0-9]+' | sort -V | tail -n 1)
 sudo sed -i "s/^ECR_VERSION=.*/ECR_VERSION=${ECR_VERSION}/" /etc/environment
 
-cd /home/ec2-user/task3-2-5/docker
-
 # Get the running image
+cd /home/ec2-user/task3-2-5/docker
 echo "Checking local version..."
-RUNNING_IMAGE=$(sudo docker compose -f docker-compose.yml images -q ghostfolio | xargs sudo docker inspect --format '{{.Config.Image}}' 2>/dev/null)
+CONTAINER_ID=$(sudo docker compose -f docker-compose.yml ps -q ghostfolio)
+RUNNING_IMAGE=$(sudo docker inspect --format '{{.Config.Image}}' "$CONTAINER_ID")
 RUNNING_VERSION="${RUNNING_IMAGE##*:}"
 
 echo "ECR image: $ECR_VERSION"
