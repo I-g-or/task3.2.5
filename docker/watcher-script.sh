@@ -7,14 +7,6 @@
 AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID}"
 AWS_REGION="${AWS_REGION}"
 AWS_REPO_NAME="${AWS_REPO_NAME}"
-RUNNING_IMAGE="0.0.6"
-
-
-# AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-# AWS_REGION="il-central-1"
-# AWS_REPO_NAME="study/ghostfolio"
-# APP_NAME="ghostfolio"
-# COMPOSE_FILE="docker-compose.yml"
 
 # Amazon ECR login
 aws ecr get-login-password --region "$AWS_REGION" \
