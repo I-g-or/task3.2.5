@@ -5,7 +5,7 @@
 
 # Required variables
 DATE=$(date +"%Y-%m-%d_%H-%M")
-BACKUP_DIR="/home/ec2-user/db-backups"
+BACKUP_DIR="/home/ec2-user/db-backup"
 S3_BUCKET="ghostfolio-backup-db"
 CONTAINER_NAME="gf-postgres"
 DB_NAME="ghostfolio-db"
