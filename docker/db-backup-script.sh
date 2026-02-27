@@ -15,7 +15,7 @@ BACKUP_FILE="$BACKUP_DIR/db_backup_$DATE.sql.gz"
 
 # Create backup
 echo "Starting backup at $(date)"
-sudo docker exec $CONTAINER_NAME pg_dump -U $DB_USER $DB_NAME | gzip > $BACKUP_FILE
+sudo docker exec $CONTAINER_NAME pg_dump -U $DB_USER $DB_NAME > $BACKUP_FILE
 
 # Upload to S3
 sudo aws s3 cp $BACKUP_FILE s3://$S3_BUCKET/
