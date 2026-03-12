@@ -5,6 +5,12 @@ services:
     container_name: ghostfolio
     restart: unless-stopped
     init: true
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: ghostfolio-logs
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream: ghostfolio-app
     cap_drop:
       - ALL
     security_opt:
