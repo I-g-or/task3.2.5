@@ -10,7 +10,7 @@ services:
       options:
         awslogs-group: ghostfolio-logs
         awslogs-region: ${AWS_REGION}
-        awslogs-stream: ghostfolio-app
+        awslogs-stream: ghostfolio-logs-stream
     cap_drop:
       - ALL
     security_opt:
