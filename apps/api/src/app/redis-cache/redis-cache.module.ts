@@ -22,7 +22,7 @@ import { RedisCacheService } from './redis-cache.service';
         return {
           store: redisStore,
           ttl: configurationService.get('CACHE_TTL'),
-          url: `redis://${redisPassword ? `:${redisPassword}` : ''}@${configurationService.get('REDIS_HOST')}:${configurationService.get('REDIS_PORT')}/${configurationService.get('REDIS_DB')}`
+          url: `rediss://${redisPassword ? `:${redisPassword}` : ''}@${configurationService.get('REDIS_HOST')}:${configurationService.get('REDIS_PORT')}/${configurationService.get('REDIS_DB')}`
         } as RedisClientOptions;
       }
     }),
