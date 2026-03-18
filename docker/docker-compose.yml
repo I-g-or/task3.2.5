@@ -20,6 +20,8 @@ services:
     ports:
       - 3333:3333
     depends_on:
+      redis:
+        condition: service_healthy
       postgres:
         condition: service_healthy
     healthcheck:
