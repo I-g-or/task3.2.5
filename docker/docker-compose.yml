@@ -30,6 +30,38 @@ services:
       timeout: 5s
       retries: 5
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: ghostfolio-nginx-logs
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream: nginx-logs-stream
+    ports:
+      - "80:80"
+      - "443:443"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /home/ec2-user/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /home/ec2-user/certbot/www:/var/www/certbot
+      - /home/ec2-user/certbot/conf:/etc/letsencrypt
+    command: sh -c "nginx -g 'daemon off;'"
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - /home/ec2-user/certbot/www:/var/www/certbot
+      - /home/ec2-user/certbot/conf:/etc/letsencrypt
+
+
   # redis:
   #   image: docker.io/library/redis:alpine
   #   container_name: gf-redis
@@ -52,30 +84,30 @@ services:
   #     timeout: 5s
   #     retries: 5
 
-  postgres:
-    image: docker.io/library/postgres:15-alpine
-    container_name: gf-postgres
-    restart: unless-stopped
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - DAC_READ_SEARCH
-      - FOWNER
-      - SETGID
-      - SETUID
-    security_opt:
-      - no-new-privileges:true
-    env_file:
-      - ../.env
-    healthcheck:
-      test:
-        ['CMD-SHELL', 'pg_isready -d "$${POSTGRES_DB}" -U $${POSTGRES_USER}']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - postgres:/var/lib/postgresql/data
+  # postgres:
+  #   image: docker.io/library/postgres:15-alpine
+  #   container_name: gf-postgres
+  #   restart: unless-stopped
+  #   cap_drop:
+  #     - ALL
+  #   cap_add:
+  #     - CHOWN
+  #     - DAC_READ_SEARCH
+  #     - FOWNER
+  #     - SETGID
+  #     - SETUID
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   env_file:
+  #     - ../.env
+  #   healthcheck:
+  #     test:
+  #       ['CMD-SHELL', 'pg_isready -d "$${POSTGRES_DB}" -U $${POSTGRES_USER}']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   volumes:
+  #     - postgres:/var/lib/postgresql/data
 
-volumes:
-  postgres:
+# volumes:
+#   postgres:
