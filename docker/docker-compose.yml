@@ -20,8 +20,6 @@ services:
     ports:
       - 3333:3333
     depends_on:
-      # redis:
-      #   condition: service_healthy
       postgres:
         condition: service_healthy
     healthcheck:
@@ -84,30 +82,30 @@ services:
   #     timeout: 5s
   #     retries: 5
 
-  # postgres:
-  #   image: docker.io/library/postgres:15-alpine
-  #   container_name: gf-postgres
-  #   restart: unless-stopped
-  #   cap_drop:
-  #     - ALL
-  #   cap_add:
-  #     - CHOWN
-  #     - DAC_READ_SEARCH
-  #     - FOWNER
-  #     - SETGID
-  #     - SETUID
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   env_file:
-  #     - ../.env
-  #   healthcheck:
-  #     test:
-  #       ['CMD-SHELL', 'pg_isready -d "$${POSTGRES_DB}" -U $${POSTGRES_USER}']
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   volumes:
-  #     - postgres:/var/lib/postgresql/data
+  postgres:
+    image: docker.io/library/postgres:15-alpine
+    container_name: gf-postgres
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_READ_SEARCH
+      - FOWNER
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - ../.env
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'pg_isready -d "$${POSTGRES_DB}" -U $${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres:/var/lib/postgresql/data
 
-# volumes:
-#   postgres:
+volumes:
+  postgres:
