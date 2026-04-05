@@ -28,36 +28,36 @@ services:
       timeout: 5s
       retries: 5
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    restart: unless-stopped
-    logging:
-      driver: awslogs
-      options:
-        awslogs-group: ghostfolio-nginx-logs
-        awslogs-region: ${AWS_REGION}
-        awslogs-stream: nginx-logs-stream
-    ports:
-      - "80:80"
-      - "443:443"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - /home/ec2-user/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /home/ec2-user/certbot/www:/var/www/certbot
-      - /home/ec2-user/certbot/conf:/etc/letsencrypt
-    command: sh -c "nginx -g 'daemon off;'"
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: nginx
+  #   restart: unless-stopped
+  #   logging:
+  #     driver: awslogs
+  #     options:
+  #       awslogs-group: ghostfolio-nginx-logs
+  #       awslogs-region: ${AWS_REGION}
+  #       awslogs-stream: nginx-logs-stream
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   volumes:
+  #     - /home/ec2-user/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - /home/ec2-user/certbot/www:/var/www/certbot
+  #     - /home/ec2-user/certbot/conf:/etc/letsencrypt
+  #   command: sh -c "nginx -g 'daemon off;'"
 
-  certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
-    volumes:
-      - /home/ec2-user/certbot/www:/var/www/certbot
-      - /home/ec2-user/certbot/conf:/etc/letsencrypt
+  # certbot:
+  #   image: certbot/certbot:latest
+  #   container_name: certbot
+  #   volumes:
+  #     - /home/ec2-user/certbot/www:/var/www/certbot
+  #     - /home/ec2-user/certbot/conf:/etc/letsencrypt
 
 
   # redis:
